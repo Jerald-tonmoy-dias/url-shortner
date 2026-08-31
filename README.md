@@ -1,53 +1,48 @@
-# 📋 Project Requirements - URL Shortener API
+# URL Shortener API
 
-This document lists all the tools, technologies, and libraries used in the URL Shortener project. Ensure you have everything set up before beginning development.
+A personal Node.js REST API that shortens URLs for authenticated users and redirects public short codes.
 
----
+This is a learning project, not a production service.
 
-## ✅ Prerequisites
+## What it does
 
-Make sure you have the following installed on your system:
+- Sign up and log in (JWT)
+- Create a short code for a URL (optional custom code)
+- Redirect `/:shortCode` to the original URL
+- List and delete the authenticated user's short URLs
+- Validate request bodies with Zod
+- Hash passwords with per-user salt (HMAC-SHA256)
 
-- [Node.js](https://nodejs.org/) (v18 or above recommended)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [Postman](https://www.postman.com/)
-- A code editor (e.g., [VS Code](https://code.visualstudio.com/))
+## Tech
 
----
+Node.js · Express · PostgreSQL · Drizzle ORM · JWT · Zod · Docker Compose
 
-## 🧱 Tech Stack Overview
-
-| Category         | Technology        | Purpose                               |
-| ---------------- | ----------------- | ------------------------------------- |
-| Backend          | Node.js + Express | REST API development                  |
-| Database         | PostgreSQL        | Relational data store                 |
-| ORM              | Drizzle ORM       | Type-safe database queries and schema |
-| Containerization | Docker + Compose  | Local PostgreSQL instance             |
-| Authentication   | JWT               | Securing private routes               |
-| Testing Tool     | Postman           | Manual API testing                    |
-
----
-
-## 📦 NPM Dependencies
-
-Run this to install all required packages:
+## Setup
 
 ```bash
-npm install express drizzle-orm pg jsonwebtoken bcrypt dotenv
+docker compose up -d
+cp .env.example .env
 ```
 
-## Auth Routes
+`.env.example` matches the local Docker Postgres service. Set `JWT_SECRET` to any local string. Do not commit `.env`.
 
-| Method | Endpoint  | Description             | Auth Required |
-| ------ | --------- | ----------------------- | ------------- |
-| POST   | `/signup` | Register a new user     | ❌            |
-| POST   | `/login`  | Login and receive token | ❌            |
+```bash
+npm install
+npm run db:push
+npm run dev
+```
 
-## URL Routes
+API base: `http://localhost:8000`
 
-| Method | Endpoint      | Description                                | Auth Required |
-| ------ | ------------- | ------------------------------------------ | ------------- |
-| POST   | `/shorten`    | Create a short URL from a long one         | ✅            |
-| GET    | `/:shortCode` | Redirect to the original URL               | ❌            |
-| GET    | `/urls`       | Get all URLs created by the logged-in user | ✅            |
-| DELETE | `/urls/:id`   | Delete a short URL (if it belongs to user) | ✅            |
+## Routes
+
+| Method | Path | Auth | Description |
+| ------ | ---- | ---- | ----------- |
+| POST | `/user/signup` | No | Register |
+| POST | `/user/login` | No | Return JWT |
+| POST | `/shorten` | Yes | Create short URL |
+| GET | `/:shortCode` | No | Redirect |
+| GET | `/codes` | Yes | List current user's URLs |
+| DELETE | `/:id` | Yes | Delete own URL |
+
+A Postman collection is in `url-shortner.postman_collection.json`.
